@@ -1,0 +1,510 @@
+import { prism } from '@mdx-deck/themes'
+
+import { base, future as theme } from './themes'
+import Layout from './Layout'
+
+export const themes = [prism, base, theme]
+
+
+
+# Functional Programming in JavaScript
+## Mocking is a Code Smell :poop:
+---
+
+<Invert>
+
+## Disclaimer
+
+<Appear>
+
+#### Mocking is :ok: for integration tests!
+#### If you just wanna test I/O, go for it :thumbsup:
+#### This will make more sense :soon:
+
+</Appear>
+
+</Invert>
+
+---
+
+## Agenda
+
+<Appear>
+
+#### Testing & coverage :white_check_mark:
+#### Mocking w/ dependency injection :syringe:
+#### An alternative solution :thinking_face:
+#### It was functional programming all along :sparkles:
+
+</Appear>
+
+---
+## Testing & Coverage
+# :white_check_mark:
+---
+
+###### Testing & Coverage :white_check_mark:
+## Types of Tests
+
+<Appear>
+
+#### Unit
+#### Integration
+#### Functional / E2E
+
+</Appear>
+
+<Notes>
+
+Unit: building blocks, black-box testing, test in isolation
+
+Integration: testing multiple layers or units
+
+Functional: testing all layers, like a user would
+
+</Notes>
+
+---
+
+##### Testing & Coverage :white_check_mark:
+## Types of Coverage
+
+<Appear>
+
+#### Code Coverage
+#### Case Coverage
+
+</Appear>
+
+<Notes>
+
+code: how much of the code is tested
+case: how much of the real-world use cases are tested
+
+</Notes>
+
+---
+
+<Invert>
+
+##### Testing & Coverage :white_check_mark:
+### 100% Code Coverage != 100% Case Coverage!
+
+<Notes>
+
+That means:
+
+We need a healthy number of different types of tests.
+
+Lots of unit testing, some integration, some e2e.
+
+</Notes>
+
+</Invert>
+
+---
+## Mocking w/ Dependency Injection
+# :syringe:
+---
+
+###### Mocking w/ Dependency Injection :syringe:
+## What is a Mock?
+
+#### Any code that stands in as a "test double" for another
+
+---
+###### Mocking w/ Dependency Injection :syringe:
+## An Example
+---
+###### Mocking w/ Dependency Injection :syringe:
+
+```js
+const getUser = id => Promise.resolve({})
+const getOrg = ({ orgId }) => Promise.resolve({})
+const formatUser = ({ user, org }) => ({})
+const isUserValid = user => true
+
+const createIdentityService = () => ({
+  getUser: async id => {
+    const user = await getUser(id)
+    const org = await getOrg(user)
+    const formattedUser = formatUser(user, org)
+
+    if (!isUserValid(formattedUser)) throw new Error('Invalid User!')
+
+    return formattedUser
+  }
+})
+```
+
+---
+###### Mocking w/ Dependency Injection :syringe:
+### Looks Good!
+
+<Appear>
+
+#### But this function has logic we need to test
+#### So... let's unit test it!
+
+</Appear>
+
+---
+
+<Invert>
+
+###### Mocking w/ Dependency Injection :syringe:
+### Hold on
+##### This logic can't be tested in isolation w/o mocking the dependencies!
+# :scream:
+
+</Invert>
+
+---
+###### Mocking w/ Dependency Injection :syringe:
+### And then it goes something like..
+
+<Appear>
+
+#### Decide on Mocks :bulb:
+#### Refactor for Dependency Injection :recycle:
+#### Create Mocks :factory:
+#### Test w/ Them :white_check_mark:
+
+</Appear>
+
+---
+
+###### Mocking w/ Dependency Injection :syringe:
+### It Almost Seems Counterintuitive
+
+<Appear>
+
+#### Increases Complexity
+#### Still Coupled
+
+</Appear>
+
+---
+
+###### Mocking w/ Dependency Injection :syringe:
+## What if there's another way?
+
+---
+## An Alternative Solution
+# :thinking_face:
+---
+###### An Alternative Solution :thinking_face:
+## A Proposal
+#### What if our integration was dead simple?
+---
+
+###### An Alternative Solution :thinking_face:
+
+```js
+const getUser = id => Promise.resolve({})
+const getOrg = ({ orgId }) => Promise.resolve({})
+const formatUser = ({ user, org }) => Promise.resolve({})
+const isUserValid = user => user.valid
+  ? Promise.resolve(user)
+  : Promise.reject('Invalid User')
+
+const getUserWithOrg = async user => ({ user, org: await getOrg(user) })
+
+const createIdentityService = id => ({
+  getUser: id =>
+    getUser(id)
+      .then(getUserWithOrg)
+      .then(formatUser)
+      .then(isUserValid),
+})
+```
+
+---
+###### An Alternative Solution :thinking_face:
+### Looks Neat
+#### But the `.then` is getting annoying :face_with_rolling_eyes:
+---
+##### An Alternative Solution :thinking_face:
+## We Can Do Better
+---
+
+###### An Alternative Solution :thinking_face:
+
+```js
+const getUser = id => Promise.resolve({})
+const getOrg = ({ orgId }) => Promise.resolve({})
+const formatUser = ({ user, org }) => Promise.resolve({})
+const isUserValid = user => user.valid
+  ? Promise.resolve(user)
+  : Promise.reject('Invalid User')
+
+const getUserWithOrg = async user => ({ user, org: await getOrg(user) })
+
+const createIdentityService = id => ({
+  getUser: asyncPipe(
+    getUser,
+    getUserWithOrg,
+    formatUser,
+    isUserValid,
+  )
+})
+```
+
+---
+
+<Invert>
+
+###### An Alternative Solution :thinking_face:
+## What Have We Done?
+
+<Appear>
+
+#### Our integration is now a promise chain
+#### There is nothing to test here
+#### Just unit test the rest
+
+</Appear>
+
+</Invert>
+
+<Notes>
+
+Promises have their own tests.
+
+We can unit test our other functions within their units in isolation.
+
+</Notes>
+
+---
+###### An Alternative Solution :thinking_face:
+## But where did we get these ideas from?
+---
+## It was functional programming all along
+# :sparkles:
+---
+###### It was functional programming all along :sparkles:
+
+### The essence of FP is functional composition
+
+#### What we just did is promise composition / chaining!
+---
+###### It was functional programming all along :sparkles:
+##### To better understand FP, we must first understand the issue we're solving
+---
+###### It was functional programming all along :sparkles:
+## Coupling
+---
+###### It was functional programming all along :sparkles:
+## Coupling
+
+#### The degree to which a unit of code depends on another
+---
+###### It was functional programming all along :sparkles:
+## Coupling
+
+#### Mocking is a sign of tight coupling
+#### But what causes tight coupling?
+---
+###### It was functional programming all along :sparkles:
+## Causes of Tight Coupling
+
+#### Mutation
+#### Side effects
+#### Responsibility Overload
+#### Procedural Instructions
+#### Class Inheritance
+---
+
+<Invert>
+
+###### It was functional programming all along :sparkles:
+## So what is the cure?
+
+<Appear>
+
+#### Use Pure functions
+#### Isolate Side-effects
+
+</Appear>
+
+</Invert>
+
+---
+
+###### It was functional programming all along :sparkles:
+## Properties of Pure Functions
+
+<Appear>
+
+#### Immutability
+#### No Side Effects
+#### Do one thing
+#### Declarative > Imperative - Structure > Instructions
+
+</Appear>
+
+---
+
+###### It was functional programming all along :sparkles:
+## Benefits of Pure Functions
+
+<Appear>
+
+#### High code reusability
+#### Less code = less surface area for bugs
+#### Easier to reason with
+#### No race conditions
+#### Can be memoized
+#### Workload can be distributed
+
+</Appear>
+
+---
+###### It was functional programming all along :sparkles:
+## Side Effects
+
+<Appear>
+
+#### I/O: disk, screen, network
+#### External processes
+#### Calling other functions w/ side-effects
+
+</Appear>
+
+---
+
+<Invert>
+
+###### It was functional programming all along :sparkles:
+## Side Effects
+
+### Mixing logic w/ side effects is a slippery slope!
+# :banana:
+
+</Invert>
+
+---
+###### It was functional programming all along :sparkles:
+## Side Effects
+
+#### Isolate them, then compose w/ pure functions
+---
+###### It was functional programming all along :sparkles:
+## Composition
+
+#### “The essence of software development is composition.”
+
+##### – Eric Elliott
+---
+###### It was functional programming all along :sparkles:
+## Composition
+
+<Appear>
+
+#### Decompose your problem
+#### Poor decomposition = needing to mock
+
+</Appear>
+
+---
+###### It was functional programming all along :sparkles:
+## Composition
+
+#### FP forces us to decompose better
+#### Then we can compose in multiple ways
+---
+###### It was functional programming all along :sparkles:
+## Composition Techniques
+
+<Appear>
+
+#### Function composition
+#### State store/model composition
+#### Object / factory composition
+#### Promise / monadic composition
+
+<Notes>
+
+eg.
+
+pipe
+
+redux's combineReducers
+
+functional mixins
+
+asyncPipe, composeM
+
+</Notes>
+
+</Appear>
+
+---
+###### It was functional programming all along :sparkles:
+## In Essence
+
+<Appear>
+
+#### Prefer pure functions & Isolate side-effects
+#### Decompose well, then compose simply
+#### Unit test everything
+#### Integration / E2E test for case coverage
+
+</Appear>
+
+---
+###### It was functional programming all along :sparkles:
+## Pipe
+---
+
+###### It was functional programming all along :sparkles:
+## Pipe
+##### Left-to-right function composition :arrow_right:
+
+```js
+const pipe = (...fns) => x =>
+  fns.reduce((res, fn) => fn(res), x)
+```
+
+---
+
+###### It was functional programming all along :sparkles:
+## asyncPipe
+##### Left-to-right promise composition :arrow_right:
+
+```js
+const asyncPipe = (...fns) => x =>
+  fns.reduce(async (res, fn) => fn(await res), x)
+```
+
+---
+
+# :exploding_head:
+
+---
+###### It was functional programming all along :sparkles:
+## Think that was cool?
+---
+
+<Invert>
+
+###### It was functional programming all along :sparkles:
+## Up Next: Monads!
+
+</Invert>
+
+---
+###### It was functional programming all along :sparkles:
+## Relax... I'm just kidding :smile:
+---
+###### It was functional programming all along :sparkles:
+## Or Am I?
+# :smirk:
+---
+
+<Invert>
+
+## Q & A
+### All questions welcome! :tada:
+
+</Invert>
