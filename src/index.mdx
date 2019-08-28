@@ -1,7 +1,7 @@
 import { prism } from '@mdx-deck/themes'
 
 import { base, future as theme } from './themes'
-import Layout from './Layout'
+import LayoutContextTitle from './LayoutContextTitle'
 
 export const themes = [prism, base, theme]
 
@@ -43,7 +43,10 @@ export const themes = [prism, base, theme]
 # :white_check_mark:
 ---
 
-###### Testing & Coverage :white_check_mark:
+<LayoutContextTitle>
+
+##### Testing & Coverage :white_check_mark:
+
 ## Types of Tests
 
 <Appear>
@@ -53,6 +56,8 @@ export const themes = [prism, base, theme]
 #### Functional / E2E
 
 </Appear>
+
+</LayoutContextTitle>
 
 <Notes>
 
@@ -66,7 +71,10 @@ Functional: testing all layers, like a user would
 
 ---
 
+<LayoutContextTitle>
+
 ##### Testing & Coverage :white_check_mark:
+
 ## Types of Coverage
 
 <Appear>
@@ -75,6 +83,8 @@ Functional: testing all layers, like a user would
 #### Case Coverage
 
 </Appear>
+
+</LayoutContextTitle>
 
 <Notes>
 
@@ -87,8 +97,15 @@ case: how much of the real-world use cases are tested
 
 <Invert>
 
+<LayoutContextTitle>
+
 ##### Testing & Coverage :white_check_mark:
+
 ### 100% Code Coverage != 100% Case Coverage!
+
+</LayoutContextTitle>
+
+</Invert>
 
 <Notes>
 
@@ -100,23 +117,34 @@ Lots of unit testing, some integration, some e2e.
 
 </Notes>
 
-</Invert>
-
 ---
 ## Mocking w/ Dependency Injection
 # :syringe:
 ---
 
-###### Mocking w/ Dependency Injection :syringe:
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ## What is a Mock?
 
 #### Any code that stands in as a "test double" for another
 
+</LayoutContextTitle>
+
 ---
-###### Mocking w/ Dependency Injection :syringe:
+
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ## An Example
+
+</LayoutContextTitle>
+
 ---
-###### Mocking w/ Dependency Injection :syringe:
+
+##### Mocking w/ Dependency Injection :syringe:
 
 ```js
 const getUser = id => Promise.resolve({})
@@ -135,10 +163,14 @@ const createIdentityService = () => ({
     return formattedUser
   }
 })
+
 ```
 
 ---
-###### Mocking w/ Dependency Injection :syringe:
+
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
 ### Looks Good!
 
 <Appear>
@@ -148,19 +180,30 @@ const createIdentityService = () => ({
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
 
 <Invert>
 
-###### Mocking w/ Dependency Injection :syringe:
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ### Hold on
 ##### This logic can't be tested in isolation w/o mocking the dependencies!
 # :scream:
 
+</LayoutContextTitle>
+
 </Invert>
 
 ---
-###### Mocking w/ Dependency Injection :syringe:
+
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ### And then it goes something like..
 
 <Appear>
@@ -172,9 +215,14 @@ const createIdentityService = () => ({
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
 
-###### Mocking w/ Dependency Injection :syringe:
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ### It Almost Seems Counterintuitive
 
 <Appear>
@@ -184,21 +232,35 @@ const createIdentityService = () => ({
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
 
-###### Mocking w/ Dependency Injection :syringe:
+<LayoutContextTitle>
+
+##### Mocking w/ Dependency Injection :syringe:
+
 ## What if there's another way?
+
+</LayoutContextTitle>
 
 ---
 ## An Alternative Solution
 # :thinking_face:
 ---
-###### An Alternative Solution :thinking_face:
+
+<LayoutContextTitle>
+
+##### An Alternative Solution :thinking_face:
+
 ## A Proposal
 #### What if our integration was dead simple?
+
+</LayoutContextTitle>
+
 ---
 
-###### An Alternative Solution :thinking_face:
+##### An Alternative Solution :thinking_face:
 
 ```js
 const getUser = id => Promise.resolve({})
@@ -220,15 +282,29 @@ const createIdentityService = id => ({
 ```
 
 ---
-###### An Alternative Solution :thinking_face:
+
+<LayoutContextTitle>
+
+##### An Alternative Solution :thinking_face:
+
 ### Looks Neat
 #### But the `.then` is getting annoying :face_with_rolling_eyes:
----
-##### An Alternative Solution :thinking_face:
-## We Can Do Better
+
+</LayoutContextTitle>
+
 ---
 
-###### An Alternative Solution :thinking_face:
+<LayoutContextTitle>
+
+##### An Alternative Solution :thinking_face:
+
+## We Can Do Better
+
+</LayoutContextTitle>
+
+---
+
+##### An Alternative Solution :thinking_face:
 
 ```js
 const getUser = id => Promise.resolve({})
@@ -254,7 +330,10 @@ const createIdentityService = id => ({
 
 <Invert>
 
-###### An Alternative Solution :thinking_face:
+<LayoutContextTitle>
+
+##### An Alternative Solution :thinking_face:
+
 ## What Have We Done?
 
 <Appear>
@@ -265,7 +344,10 @@ const createIdentityService = id => ({
 
 </Appear>
 
+</LayoutContextTitle>
+
 </Invert>
+
 
 <Notes>
 
@@ -276,48 +358,103 @@ We can unit test our other functions within their units in isolation.
 </Notes>
 
 ---
-###### An Alternative Solution :thinking_face:
+
+<LayoutContextTitle>
+
+##### An Alternative Solution :thinking_face:
+
 ## But where did we get these ideas from?
+
+</LayoutContextTitle>
+
 ---
 ## It was functional programming all along
 # :sparkles:
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
 
 ### The essence of FP is functional composition
 
 #### What we just did is promise composition / chaining!
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ##### To better understand FP, we must first understand the issue we're solving
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Coupling
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Coupling
 
 #### The degree to which a unit of code depends on another
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Coupling
 
 #### Mocking is a sign of tight coupling
 #### But what causes tight coupling?
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Causes of Tight Coupling
+
+<Appear>
 
 #### Mutation
 #### Side effects
 #### Responsibility Overload
 #### Procedural Instructions
 #### Class Inheritance
+
+</Appear>
+
+</LayoutContextTitle>
+
 ---
 
 <Invert>
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## So what is the cure?
 
 <Appear>
@@ -327,11 +464,16 @@ We can unit test our other functions within their units in isolation.
 
 </Appear>
 
+</LayoutContextTitle>
+
 </Invert>
 
 ---
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Properties of Pure Functions
 
 <Appear>
@@ -343,9 +485,14 @@ We can unit test our other functions within their units in isolation.
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Benefits of Pure Functions
 
 <Appear>
@@ -359,8 +506,14 @@ We can unit test our other functions within their units in isolation.
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Side Effects
 
 <Appear>
@@ -371,32 +524,57 @@ We can unit test our other functions within their units in isolation.
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
 
 <Invert>
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Side Effects
 
 ### Mixing logic w/ side effects is a slippery slope!
 # :banana:
 
+</LayoutContextTitle>
+
 </Invert>
 
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Side Effects
 
 #### Isolate them, then compose w/ pure functions
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Composition
 
 #### “The essence of software development is composition.”
 
 ##### – Eric Elliott
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Composition
 
 <Appear>
@@ -406,14 +584,27 @@ We can unit test our other functions within their units in isolation.
 
 </Appear>
 
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Composition
 
 #### FP forces us to decompose better
 #### Then we can compose in multiple ways
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Composition Techniques
 
 <Appear>
@@ -422,6 +613,11 @@ We can unit test our other functions within their units in isolation.
 #### State store/model composition
 #### Object / factory composition
 #### Promise / monadic composition
+
+</Appear>
+
+</LayoutContextTitle>
+
 
 <Notes>
 
@@ -437,10 +633,13 @@ asyncPipe, composeM
 
 </Notes>
 
-</Appear>
 
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## In Essence
 
 <Appear>
@@ -452,12 +651,24 @@ asyncPipe, composeM
 
 </Appear>
 
----
-###### It was functional programming all along :sparkles:
-## Pipe
+</LayoutContextTitle>
+
 ---
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
+## Pipe
+
+</LayoutContextTitle>
+
+---
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Pipe
 ##### Left-to-right function composition :arrow_right:
 
@@ -466,9 +677,14 @@ const pipe = (...fns) => x =>
   fns.reduce((res, fn) => fn(res), x)
 ```
 
+</LayoutContextTitle>
+
 ---
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## asyncPipe
 ##### Left-to-right promise composition :arrow_right:
 
@@ -477,29 +693,57 @@ const asyncPipe = (...fns) => x =>
   fns.reduce(async (res, fn) => fn(await res), x)
 ```
 
+</LayoutContextTitle>
+
 ---
 
 # :exploding_head:
 
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Think that was cool?
+
+</LayoutContextTitle>
+
 ---
 
 <Invert>
 
-###### It was functional programming all along :sparkles:
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Up Next: Monads!
+
+</LayoutContextTitle>
 
 </Invert>
 
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Relax... I'm just kidding :smile:
+
+</LayoutContextTitle>
+
 ---
-###### It was functional programming all along :sparkles:
+
+<LayoutContextTitle>
+
+##### It was functional programming all along :sparkles:
+
 ## Or Am I?
 # :smirk:
+
+</LayoutContextTitle>
+
 ---
 
 <Invert>
