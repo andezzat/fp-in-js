@@ -39,6 +39,7 @@ export const base = {
   },
   styles: {
     root: {
+      textAlign: 'center',
       fontFamily: 'body',
       lineHeight: 'body',
       fontWeight: 'body',
@@ -85,7 +86,7 @@ export const base = {
       fontFamily: 'monospace',
       overflowX: 'auto',
       code: {
-        color: 'inherit'
+        color: 'inherit',
       },
     },
     code: {

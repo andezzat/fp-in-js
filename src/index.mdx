@@ -18,8 +18,7 @@ export const themes = [prism, base, theme]
 <Appear>
 
 #### Mocking is :ok: for integration tests!
-#### If you just wanna test I/O, go for it :thumbsup:
-#### This will make more sense :soon:
+#### FP is best used w/ OOP & co.
 
 </Appear>
 
@@ -31,12 +30,56 @@ export const themes = [prism, base, theme]
 
 <Appear>
 
-#### Testing & coverage :white_check_mark:
-#### Mocking w/ dependency injection :syringe:
-#### An alternative solution :thinking_face:
-#### It was functional programming all along :sparkles:
+#### :white_check_mark: Testing & coverage
+#### :syringe: Mocking w/ dependency injection
+#### :thinking_face: An alternative solution
+#### :sparkles: Intro to Functional Programming
 
 </Appear>
+
+---
+
+<Invert>
+
+#### But first...
+## What EXACTLY is a code smell :poop: ?
+
+</Invert>
+
+---
+
+<Invert>
+
+<LayoutContextTitle>
+
+##### What EXACTLY is a code smell :poop: ?
+
+#### “A code smell is a surface indication that usually corresponds to a deeper problem in the system.”
+
+##### - Martin Fowler
+
+</LayoutContextTitle>
+
+</Invert>
+
+---
+
+<LayoutContextTitle>
+
+##### What EXACTLY is a code smell :poop: ?
+
+## Some examples
+
+<Appear>
+
+#### Big functions :arrow_up_down:
+#### Repitition/Duplication :repeat:
+#### Early Performance Optimization :zap:
+#### Comments (sweetest) :speech_balloon:
+
+</Appear>
+
+</LayoutContextTitle>
 
 ---
 ## Testing & Coverage
@@ -51,9 +94,9 @@ export const themes = [prism, base, theme]
 
 <Appear>
 
-#### Unit
-#### Integration
-#### Functional / E2E
+#### Unit :one:
+#### Integration :fast_forward:
+#### Functional / E2E :black_right_pointing_double_triangle_with_vertical_bar:
 
 </Appear>
 
@@ -61,11 +104,11 @@ export const themes = [prism, base, theme]
 
 <Notes>
 
-Unit: building blocks, black-box testing, test in isolation
+Unit: building blocks, black-box testing, test in isolation; test most
 
-Integration: testing multiple layers or units
+Integration: testing multiple layers or units together; test less
 
-Functional: testing all layers, like a user would
+Functional: testing all layers, like a user would; test less
 
 </Notes>
 
@@ -147,23 +190,21 @@ Lots of unit testing, some integration, some e2e.
 ##### Mocking w/ Dependency Injection :syringe:
 
 ```js
-const getUser = id => Promise.resolve({})
-const getOrg = ({ orgId }) => Promise.resolve({})
-const formatUser = ({ user, org }) => ({})
-const isUserValid = user => true
+// identityService.js
+import userProvider from '../userProvider'
+import orgProvider from '../orgProvider'
 
 const createIdentityService = () => ({
   getUser: async id => {
-    const user = await getUser(id)
-    const org = await getOrg(user)
-    const formattedUser = formatUser(user, org)
+    const user = await userProvider.getById({ id })
+    if (!formattedUser.id || !formattedUser.name) throw new Error('Invalid User!')
 
-    if (!isUserValid(formattedUser)) throw new Error('Invalid User!')
+    const org = await orgProvider.getById(user)
+    const formattedUser = { ...user, org }
 
     return formattedUser
   }
 })
-
 ```
 
 ---
@@ -219,6 +260,52 @@ const createIdentityService = () => ({
 
 ---
 
+##### Mocking w/ Dependency Injection :syringe:
+
+```js
+// identityService.js
+const createIdentityService = ({ userProvider, orgProvider }) => ({
+  getUser: async id => ...,
+})
+```
+
+---
+
+##### Mocking w/ Dependency Injection :syringe:
+
+```js
+// identityService.test.js
+import createIdentityService from './identityService'
+
+const user = { id: 1, name: 'Andrew' }
+const org = { id: 101, name: 'MelbJS' }
+
+const invalidUserProvider = { getById: () => ({}) }
+const userProvider = { getById: () => user }
+const orgProvider = { getById: () => org }
+
+describe('identityService.getUser()', () => {
+  it('throws if user is invalid', () =>
+    expect(
+      createIdentityService({ userProvider: invalidUserProvider })
+        .getUser({ id: 1 })
+    ).to.throw(
+      new Error('Invalid User!')
+    )
+  )
+  it('returns correctly formatted user {}', () =>
+    expect(
+      createIdentityService({ userProvider })
+        .getUser({ id: 1 })
+    ).to.return({
+      ...user, org
+    })
+  )
+})
+```
+
+---
+
 <LayoutContextTitle>
 
 ##### Mocking w/ Dependency Injection :syringe:
@@ -227,7 +314,8 @@ const createIdentityService = () => ({
 
 <Appear>
 
-#### Increases Complexity
+#### More test code
+#### Increased Complexity
 #### Still Coupled
 
 </Appear>
@@ -263,21 +351,27 @@ const createIdentityService = () => ({
 ##### An Alternative Solution :thinking_face:
 
 ```js
-const getUser = id => Promise.resolve({})
-const getOrg = ({ orgId }) => Promise.resolve({})
-const formatUser = ({ user, org }) => Promise.resolve({})
-const isUserValid = user => user.valid
+// identityHelper.js
+const identityHelper = {
+  format: ({ user, org }) => ({ ...user, org }),
+  isValid: user => !user.id || !user.name,
+}
+
+// identityService.js
+import userProvider from '../userProvider'
+import orgProvider from '../orgProvider'
+import identityHelper from './identityHelper'
+
+const getUserWithOrg = async user => ({ user, org: await orgProvider.getById(user) })
+const throwIfUserInvalid = user => identityHelper.isValid(user)
   ? Promise.resolve(user)
-  : Promise.reject('Invalid User')
+  : Promise.reject('Invalid User!')
 
-const getUserWithOrg = async user => ({ user, org: await getOrg(user) })
-
-const createIdentityService = id => ({
-  getUser: id =>
-    getUser(id)
-      .then(getUserWithOrg)
-      .then(formatUser)
-      .then(isUserValid),
+const createIdentityService = () => ({
+  getUser: id => userProvider.getById(id)
+    .then(getUserWithOrg)
+    .then(identityHelper.format)
+    .then(throwIfUserInvalid),
 })
 ```
 
@@ -307,21 +401,118 @@ const createIdentityService = id => ({
 ##### An Alternative Solution :thinking_face:
 
 ```js
-const getUser = id => Promise.resolve({})
-const getOrg = ({ orgId }) => Promise.resolve({})
-const formatUser = ({ user, org }) => Promise.resolve({})
-const isUserValid = user => user.valid
+// identityHelper.js
+const identityHelper = {
+  format: ({ user, org }) => ({ ...user, org }),
+  isValid: user => !user.id || !user.name,
+}
+
+// identityService.js
+import userProvider from '../userProvider'
+import orgProvider from '../orgProvider'
+import identityHelper from './identityHelper'
+
+const getUserWithOrg = async user => ({ user, org: await orgProvider.getById(user) })
+const throwIfUserInvalid = user => identityHelper.isValid(user)
   ? Promise.resolve(user)
-  : Promise.reject('Invalid User')
+  : Promise.reject('Invalid User!')
 
-const getUserWithOrg = async user => ({ user, org: await getOrg(user) })
-
-const createIdentityService = id => ({
+const createIdentityService = () => ({
   getUser: asyncPipe(
-    getUser,
+    userProvider.getById,
     getUserWithOrg,
-    formatUser,
-    isUserValid,
+    identityHelper.format,
+    throwIfUserInvalid,
+  )
+})
+```
+
+---
+##### An Alternative Solution :thinking_face:
+
+### Before
+
+```js
+// identityService.js
+import userProvider from '../userProvider'
+import orgProvider from '../orgProvider'
+
+const createIdentityService = () => ({
+  getUser: async id => {
+    const user = await userProvider.getById({ id })
+    const org = await orgProvider.getById(user)
+    const formattedUser = { ...user, org }
+
+    if (!user.id || !user.name) throw new Error('Invalid User!')
+
+    return formattedUser
+  }
+})
+```
+
+---
+
+##### An Alternative Solution :thinking_face:
+
+```js
+// identityHelper.test.js
+import identityHelper from './identityHelper'
+
+const user = { id: 1, name: 'Andrew' }
+const org = { id: 1, name: 'MelbJS' }
+
+describe('identityHelper.format()', () => {
+  it('returns correctly formatted {}', () =>
+    expect(
+      identityHelper.format({ user, org })
+    ).to.return({
+      ...user, org
+    })
+  )
+})
+
+describe('identityHelper.throwIfInvalid', () => {
+  it('returns false if user invalid', () =>
+    expect(
+      identityHelper.isValid({ name: 'Andrew' })
+    ).to.return(
+      false
+    )
+  )
+})
+```
+
+---
+
+### Before
+
+```js
+// identityService.test.js
+import createIdentityService from './identityService'
+
+const user = { id: 1, name: 'Andrew' }
+const org = { id: 101, name: 'MelbJS' }
+
+const invalidUserProvider = { getById: () => ({}) }
+const userProvider = { getById: () => user }
+const orgProvider = { getById: () => org }
+
+describe('identityService.getUser()', () => {
+  it('throws if user is invalid', () =>
+    expect(
+      createIdentityService({ userProvider: invalidUserProvider })
+        .getUser({ id: 1 })
+    ).to.throw(
+      new Error('Invalid User!')
+    )
+  )
+  it('returns correctly formatted user {}', () =>
+    expect(
+      createIdentityService({ userProvider })
+        .getUser({ id: 1 })
+    ).to.return({
+      ...user, org
+    })
   )
 })
 ```
@@ -340,7 +531,7 @@ const createIdentityService = id => ({
 
 #### Our integration is now a promise chain
 #### There is nothing to test here
-#### Just unit test the rest
+#### Just unit test the logic/branching
 
 </Appear>
 
@@ -481,7 +672,7 @@ We can unit test our other functions within their units in isolation.
 #### Immutability
 #### No Side Effects
 #### Do one thing
-#### Declarative > Imperative - Structure > Instructions
+#### Declarative > Imperative
 
 </Appear>
 
@@ -502,7 +693,7 @@ We can unit test our other functions within their units in isolation.
 #### Easier to reason with
 #### No race conditions
 #### Can be memoized
-#### Workload can be distributed
+#### Distributable workload
 
 </Appear>
 
@@ -551,7 +742,7 @@ We can unit test our other functions within their units in isolation.
 
 ## Side Effects
 
-#### Isolate them, then compose w/ pure functions
+#### Isolate them, then compose w/ other pure functions
 
 </LayoutContextTitle>
 
@@ -646,7 +837,7 @@ asyncPipe, composeM
 
 #### Prefer pure functions & Isolate side-effects
 #### Decompose well, then compose simply
-#### Unit test everything
+#### Unit test everything (logic)
 #### Integration / E2E test for case coverage
 
 </Appear>
@@ -717,7 +908,7 @@ const asyncPipe = (...fns) => x =>
 
 ##### It was functional programming all along :sparkles:
 
-## Up Next: Monads!
+## Up Next: Monads! :face_with_monocle:
 
 </LayoutContextTitle>
 
@@ -743,6 +934,17 @@ const asyncPipe = (...fns) => x =>
 # :smirk:
 
 </LayoutContextTitle>
+
+---
+
+<Invert>
+
+#### Credits
+
+### Mocking is A Code Smell - Eric Elliott
+### MDX Deck - Brent Jackson (@jxnblk)
+
+</Invert>
 
 ---
 
